@@ -51,7 +51,6 @@ import {
   Users,
   HandHeart,
   TrendingUp,
-  Calendar,
   Search,
   Filter,
   X,
@@ -62,7 +61,6 @@ import {
   LogIn,
   UserPlus,
   LogOut,
-  Settings,
   BookMarked,
   Edit3,
   Trash2,
@@ -492,9 +490,9 @@ function App() {
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-row items-center justify-center gap-3">
               {/* Dark Mode Toggle */}
-              <div className="flex items-center gap-3 bg-background/50 dark:bg-background/50 rounded-full px-4 py-2 border border-border">
+              <div className="flex items-center gap-2 bg-background/50 dark:bg-background/50 rounded-full px-3 py-2 border border-border">
                 <Sun className="h-4 w-4 text-yellow-500" />
                 <Switch
                   checked={darkMode}
@@ -510,7 +508,7 @@ function App() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full"
+                      className="relative h-10 w-10 rounded-full p-0"
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarFallback className="bg-green-600 text-white">
@@ -555,23 +553,23 @@ function App() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-row items-center justify-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setIsSignInOpen(true)}
-                    className="h-9 px-3 text-sm font-medium"
+                    className="h-9 px-3 text-sm font-medium flex items-center justify-center"
                   >
-                    <LogIn className="h-4 w-4 mr-1.5" />
-                    Sign In
+                    <LogIn className="h-4 w-4 mr-1.5 flex-shrink-0" />
+                    <span>Sign In</span>
                   </Button>
                   <Button
                     size="sm"
                     onClick={() => setIsSignUpOpen(true)}
-                    className="h-9 px-3 text-sm font-medium bg-green-600 hover:bg-green-700 text-white"
+                    className="h-9 px-3 text-sm font-medium bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
                   >
-                    <UserPlus className="h-4 w-4 mr-1.5" />
-                    Sign Up
+                    <UserPlus className="h-4 w-4 mr-1.5 flex-shrink-0" />
+                    <span>Sign Up</span>
                   </Button>
                 </div>
               )}
