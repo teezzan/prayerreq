@@ -54,3 +54,37 @@ type UpdatePrayerRequestInput struct {
 	Category    *string  `json:"category"`
 	Tags        []string `json:"tags"`
 }
+
+// Comment represents a comment/message on a prayer request
+type Comment struct {
+	ID              bson.ObjectID `json:"id" bson:"_id,omitempty"`
+	PrayerRequestID bson.ObjectID `json:"prayer_request_id" bson:"prayer_request_id"`
+	UserName        string        `json:"user_name" bson:"user_name"`
+	Message         string        `json:"message" bson:"message"`
+	IsAnonymous     bool          `json:"is_anonymous" bson:"is_anonymous"`
+	CreatedAt       time.Time     `json:"created_at" bson:"created_at"`
+}
+
+// PrayerStats represents prayer request statistics
+type PrayerStats struct {
+	TotalPrayers    int            `json:"total_prayers"`
+	TotalPrayCount  int            `json:"total_pray_count"`
+	AnsweredPrayers int            `json:"answered_prayers"`
+	UrgentPrayers   int            `json:"urgent_prayers"`
+	CategoriesCount map[string]int `json:"categories_count"`
+	RecentActivity  []ActivityItem `json:"recent_activity"`
+}
+
+// ActivityItem represents a recent activity item
+type ActivityItem struct {
+	Type      string    `json:"type"` // "prayer_created", "prayer_answered", "pray_count_increased"
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// CreateCommentInput represents input for creating a comment
+type CreateCommentInput struct {
+	Message     string `json:"message" validate:"required"`
+	UserName    string `json:"user_name"`
+	IsAnonymous bool   `json:"is_anonymous"`
+}

@@ -19,11 +19,28 @@ type HTTPHandler struct {
 // RegisterRoutes registers prayer request routes
 func (h *HTTPHandler) RegisterRoutes(r chi.Router) {
 	r.Route("/prayers", func(r chi.Router) {
+		// Basic CRUD operations
 		r.Get("/", h.service.GetPrayers)
 		r.Post("/", h.service.CreatePrayer)
-		r.Get("/{id}", h.service.GetPrayerByID)
-		r.Put("/{id}", h.service.UpdatePrayer)
-		r.Delete("/{id}", h.service.DeletePrayer)
-		r.Post("/{id}/pray", h.service.IncrementPrayCount)
+
+		// Specific utility endpoints
+		r.Get("/search", h.service.SearchPrayers)
+		r.Get("/stats", h.service.GetPrayerStats)
+		r.Get("/recent", h.service.GetRecentPrayers)
+
+		// Category routes
+		r.Route("/category", func(r chi.Router) {
+			r.Get("/{category}", h.service.GetPrayersByCategory)
+		})
+
+		// Individual prayer operations - these should be last
+		r.Route("/{id}", func(r chi.Router) {
+			r.Get("/", h.service.GetPrayerByID)
+			r.Put("/", h.service.UpdatePrayer)
+			r.Delete("/", h.service.DeletePrayer)
+			r.Post("/pray", h.service.IncrementPrayCount)
+			r.Post("/comments", h.service.AddComment)
+			r.Get("/comments", h.service.GetComments)
+		})
 	})
 }
