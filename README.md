@@ -103,3 +103,164 @@ May Allah accept all the prayers submitted through this platform and grant what 
 ---
 
 _"And whoever relies upon Allah - then He is sufficient for him. Indeed, Allah will accomplish His purpose."_ - Quran 65:3
+
+# Prayer Request Application
+
+A full-stack prayer request application with a React/TypeScript frontend and Go backend using MongoDB.
+
+## Project Structure
+
+This is a monorepo containing both frontend and backend applications:
+
+```
+prayerreq/
+├── fe/                    # Frontend (React/TypeScript/Vite)
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+├── be/                    # Backend (Go/MongoDB/Chi)
+│   ├── data/              # Data models
+│   ├── repository/        # Data access layer
+│   ├── service/           # Business logic
+│   ├── main.go
+│   ├── route.go
+│   └── docker-compose.yml
+├── docker-compose.yml     # MongoDB setup
+└── README.md
+```
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm (for frontend)
+- Go 1.19+ (for backend)
+- Docker and Docker Compose (for MongoDB)
+
+### 1. Start MongoDB
+
+```bash
+cd be
+docker-compose up -d
+```
+
+### 2. Start Backend
+
+```bash
+cd be
+go mod tidy
+go run main.go route.go
+```
+
+The API will be available at `http://localhost:8080`
+
+### 3. Start Frontend
+
+```bash
+cd fe
+npm install
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`
+
+## Features
+
+### Backend (Go)
+
+- ✅ RESTful API with Chi router
+- ✅ MongoDB integration with official Go driver
+- ✅ Clean architecture (Repository + Service layers)
+- ✅ CORS support for frontend integration
+- ✅ Prayer request CRUD operations
+- ✅ User management
+- ✅ Health check endpoint
+
+### Frontend (React/TypeScript)
+
+- ⚛️ React 18 with TypeScript
+- ⚡ Vite for fast development
+- 🎨 Modern UI components
+- 📱 Responsive design
+
+## API Endpoints
+
+### Prayer Requests
+
+- `GET /api/v1/prayers` - Get all prayer requests
+- `POST /api/v1/prayers` - Create a prayer request
+- `GET /api/v1/prayers/{id}` - Get specific prayer request
+- `PUT /api/v1/prayers/{id}` - Update prayer request
+- `DELETE /api/v1/prayers/{id}` - Delete prayer request
+
+### Users
+
+- `GET /api/v1/users` - Get all users
+- `POST /api/v1/users` - Create user
+- `GET /api/v1/users/{id}` - Get specific user
+- `PUT /api/v1/users/{id}` - Update user
+- `DELETE /api/v1/users/{id}` - Delete user
+
+## Database Management
+
+Access MongoDB via Mongo Express at `http://localhost:8081`
+
+- Username: `admin`
+- Password: `password`
+
+## Technology Stack
+
+### Backend
+
+- **Language**: Go 1.19+
+- **Router**: [Chi](https://github.com/go-chi/chi)
+- **Database**: MongoDB with [official Go driver](https://github.com/mongodb/mongo-go-driver)
+- **Architecture**: Clean Architecture (Repository + Service pattern)
+
+### Frontend
+
+- **Framework**: React 18
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **Styling**: CSS/SCSS (configurable)
+
+## Development
+
+### Adding New Features
+
+#### Backend
+
+1. Define data models in `be/data/struct.go`
+2. Add repository methods in `be/repository/repository.go`
+3. Implement business logic in `be/service/service.go`
+4. Add routes in `be/route.go`
+
+#### Frontend
+
+1. Create components in `fe/src/components/`
+2. Add pages in `fe/src/pages/`
+3. Update routing as needed
+
+### Environment Configuration
+
+#### Backend (.env in be/ directory)
+
+```env
+MONGODB_URI=mongodb://localhost:27017
+PORT=8080
+DB_NAME=prayerreq
+ENVIRONMENT=development
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
