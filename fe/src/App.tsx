@@ -68,7 +68,11 @@ import {
   BarChart3,
   Activity,
   Crown,
+  Loader2,
 } from "lucide-react";
+
+// Import our custom hook
+import { usePrayerRequests } from "@/hooks/usePrayerRequests";
 
 interface User {
   id: string;
@@ -141,6 +145,16 @@ const CATEGORIES = [
 const ITEMS_PER_PAGE = 6;
 
 function App() {
+  // Use our custom hook for prayer requests
+  const {
+    prayerRequests,
+    loading,
+    error: apiError,
+    createPrayerRequest,
+    incrementPrayCount,
+    deletePrayerRequest,
+  } = usePrayerRequests();
+
   // Authentication state
   const [user, setUser] = useState<User | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -156,99 +170,6 @@ function App() {
   const [showMyRequests, setShowMyRequests] = useState(false);
   const [showSavedRequests, setShowSavedRequests] = useState(false);
 
-  const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>([
-    {
-      id: "1",
-      name: "Sarah Ahmad",
-      request:
-        "Please pray for my mother's health. She is undergoing surgery next week. May Allah grant her quick recovery.",
-      location: "Makkah, Saudi Arabia",
-      createdAt: new Date("2024-01-15"),
-      prayedFor: 42,
-      isUrgent: true,
-      category: "health",
-      authorId: "user1",
-    },
-    {
-      id: "2",
-      name: "Muhammad Ali",
-      request:
-        "Going for Umrah next month, please include me and my family in your prayers. May Allah accept our pilgrimage.",
-      location: "Madinah, Saudi Arabia",
-      createdAt: new Date("2024-01-14"),
-      prayedFor: 28,
-      category: "travel",
-      authorId: "user2",
-    },
-    {
-      id: "3",
-      name: "",
-      request:
-        "Please pray for success in my studies and that Allah guides me to the right path in my career.",
-      createdAt: new Date("2024-01-13"),
-      prayedFor: 15,
-      isAnonymous: true,
-      category: "studies",
-      authorId: "user3",
-    },
-    {
-      id: "4",
-      name: "Ahmed Khan",
-      request:
-        "My family is going through financial difficulties. Please pray that Allah provides us with halal sustenance.",
-      location: "London, UK",
-      createdAt: new Date("2024-01-12"),
-      prayedFor: 67,
-      category: "family",
-      authorId: "user4",
-    },
-    {
-      id: "5",
-      name: "",
-      request:
-        "Please pray for my marriage. May Allah bless me with a righteous spouse who will help me in my deen.",
-      createdAt: new Date("2024-01-11"),
-      prayedFor: 23,
-      isUrgent: true,
-      isAnonymous: true,
-      category: "marriage",
-      authorId: "user5",
-    },
-    // Add more sample data for pagination testing
-    {
-      id: "6",
-      name: "Omar Hassan",
-      request:
-        "Please pray for my father's recovery from illness. May Allah heal him completely.",
-      location: "Cairo, Egypt",
-      createdAt: new Date("2024-01-10"),
-      prayedFor: 34,
-      category: "health",
-      authorId: "user6",
-    },
-    {
-      id: "7",
-      name: "Fatima Al-Zahra",
-      request:
-        "Seeking prayers for success in my job interview tomorrow. May Allah open doors for me.",
-      createdAt: new Date("2024-01-09"),
-      prayedFor: 18,
-      category: "work",
-      authorId: "user7",
-    },
-    {
-      id: "8",
-      name: "",
-      request:
-        "Please make dua for guidance in choosing the right university for my studies.",
-      createdAt: new Date("2024-01-08"),
-      prayedFor: 12,
-      isAnonymous: true,
-      category: "guidance",
-      authorId: "user8",
-    },
-  ]);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newRequest, setNewRequest] = useState({
     name: "",
@@ -260,6 +181,7 @@ function App() {
   });
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Dark mode effect
   useEffect(() => {
@@ -269,6 +191,15 @@ function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
+
+  // Show API errors
+  useEffect(() => {
+    if (apiError) {
+      setAlertMessage(apiError);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 5000);
+    }
+  }, [apiError]);
 
   // Filter requests based on search and filters
   const filteredRequests = useMemo(() => {
@@ -338,77 +269,58 @@ function App() {
   const handleSaveRequest = (requestId: string) => {
     if (!user) return;
 
-    setPrayerRequests((requests) =>
-      requests.map((request) =>
-        request.id === requestId
-          ? {
-              ...request,
-              savedBy: request.savedBy?.includes(user.id)
-                ? request.savedBy.filter((id) => id !== user.id)
-                : [...(request.savedBy || []), user.id],
-            }
-          : request
-      )
-    );
+    // This would need backend implementation for user favorites
+    // For now, just local state management
+    console.log("Save request functionality needs backend implementation");
   };
 
-  const handleDeleteRequest = (requestId: string) => {
-    setPrayerRequests((requests) =>
-      requests.filter((request) => request.id !== requestId)
-    );
-    setAlertMessage("Prayer request has been deleted.");
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 3000);
+  const handleDeleteRequest = async (requestId: string) => {
+    const success = await deletePrayerRequest(requestId);
+    if (success) {
+      setAlertMessage("Prayer request has been deleted.");
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       newRequest.request.trim() &&
       (newRequest.isAnonymous || newRequest.name.trim() || user)
     ) {
-      const request: PrayerRequest = {
-        id: Date.now().toString(),
-        name: newRequest.isAnonymous ? "" : newRequest.name || user?.name || "",
-        request: newRequest.request,
-        location: newRequest.location || undefined,
-        createdAt: new Date(),
-        prayedFor: 0,
-        isUrgent: newRequest.isUrgent,
-        isAnonymous: newRequest.isAnonymous,
-        category: newRequest.category,
-        authorId: user?.id,
-      };
-      setPrayerRequests([request, ...prayerRequests]);
-      setNewRequest({
-        name: "",
-        request: "",
-        location: "",
-        isUrgent: false,
-        isAnonymous: false,
-        category: "other",
-      });
-      setIsDialogOpen(false);
-      setShowAlert(true);
-      setAlertMessage(
-        "Your prayer request has been submitted. May Allah answer your prayers. Ameen."
-      );
-      setTimeout(() => setShowAlert(false), 3000);
+      setIsSubmitting(true);
+
+      const success = await createPrayerRequest(newRequest);
+
+      if (success) {
+        setNewRequest({
+          name: "",
+          request: "",
+          location: "",
+          isUrgent: false,
+          isAnonymous: false,
+          category: "other",
+        });
+        setIsDialogOpen(false);
+        setShowAlert(true);
+        setAlertMessage(
+          "Your prayer request has been submitted. May Allah answer your prayers. Ameen."
+        );
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+
+      setIsSubmitting(false);
     }
   };
 
-  const handlePrayedFor = (id: string) => {
-    setPrayerRequests((requests) =>
-      requests.map((request) =>
-        request.id === id
-          ? {
-              ...request,
-              prayedFor: request.prayedFor + 1,
-              prayedByUser: true,
-            }
-          : request
-      )
-    );
+  const handlePrayedFor = async (id: string) => {
+    const success = await incrementPrayCount(id);
+    if (success) {
+      setAlertMessage("May Allah accept your prayers. Ameen.");
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2000);
+    }
   };
 
   const handleCopyRequest = async (request: PrayerRequest) => {
@@ -981,9 +893,17 @@ function App() {
                 <DialogFooter>
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 w-full sm:w-auto"
                   >
-                    Submit Request
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      "Submit Request"
+                    )}
                   </Button>
                 </DialogFooter>
               </form>
@@ -999,7 +919,16 @@ function App() {
             </h2>
           </div>
 
-          {filteredRequests.length === 0 ? (
+          {loading ? (
+            <Card className="p-8 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+                <p className="text-muted-foreground">
+                  Loading prayer requests...
+                </p>
+              </div>
+            </Card>
+          ) : filteredRequests.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground">
                 No prayer requests found matching your criteria.

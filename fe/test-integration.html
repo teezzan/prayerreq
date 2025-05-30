@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Integration Test</title>
+  </head>
+  <body>
+    <h1>Prayer Request API Test</h1>
+
+    <div id="results"></div>
+
+    <script>
+      async function testAPI() {
+        const resultsDiv = document.getElementById("results");
+
+        try {
+          // Test fetching prayer requests
+          resultsDiv.innerHTML += "<h2>Testing GET /api/v1/prayers</h2>";
+          const response = await fetch("http://localhost:8080/api/v1/prayers");
+          const data = await response.json();
+
+          resultsDiv.innerHTML += `<p>Status: ${response.status}</p>`;
+          resultsDiv.innerHTML += `<p>Data count: ${data.length}</p>`;
+          resultsDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+
+          // Test creating a prayer request
+          resultsDiv.innerHTML += "<h2>Testing POST /api/v1/prayers</h2>";
+          const createResponse = await fetch(
+            "http://localhost:8080/api/v1/prayers",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: "Test from Frontend",
+                description: "This is a test prayer request from frontend",
+                user_name: "",
+                is_anonymous: true,
+                priority: "medium",
+                category: "other",
+                tags: ["test"],
+              }),
+            }
+          );
+
+          const createData = await createResponse.json();
+          resultsDiv.innerHTML += `<p>Create Status: ${createResponse.status}</p>`;
+          resultsDiv.innerHTML += `<pre>${JSON.stringify(
+            createData,
+            null,
+            2
+          )}</pre>`;
+        } catch (error) {
+          resultsDiv.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+      }
+
+      // Run test when page loads
+      testAPI();
+    </script>
+  </body>
+</html>
