@@ -271,7 +271,10 @@ function App() {
 
     // This would need backend implementation for user favorites
     // For now, just local state management
-    console.log("Save request functionality needs backend implementation");
+    console.log(
+      "Save request functionality needs backend implementation",
+      requestId
+    );
   };
 
   const handleDeleteRequest = async (requestId: string) => {
